@@ -27,6 +27,7 @@ import util.NFGInfo;
 import util.ObservableEnvInfo;
 import util.State;
 import util.StateDomain;
+import util.VectorQueue;
 
 // This is a subclass of agent which can be instantiated. It Creates a learning agent which has its own strategies and learnd from its mistakes
 public class QLearningAgent extends Agent {
@@ -41,7 +42,7 @@ public class QLearningAgent extends Agent {
 	private float epsilon;
 	private double alpha;
 
-	private static double alpha_decay = 0.5000001;
+	private static double polyAlphaDecay = 0.5000001;
 	private String alphaDecay;
 	private Map<State,Map<Action,Integer>> alpha_t;
 	private float gamma;
@@ -49,6 +50,7 @@ public class QLearningAgent extends Agent {
 	//given a state, returns a set of pairs <action,value>
 	Map<State,Map<Object,Double>> Q = new HashMap<State,Map<Object,Double>>();
 	Double Qinit;
+	VectorQueue<State> memory = new VectorQueue<State>(1);
 	
 	
 	public void init(Element e, int id){
@@ -79,15 +81,16 @@ public class QLearningAgent extends Agent {
 	}
 	
 	@Override
-	public void update(ObservableEnvInfo prev, ObservableEnvInfo curr) {
+	public void update(ObservableEnvInfo curr) {
 		
 			currentState = (State) stateMapper.getState(curr);
-			State prevState = (State) stateMapper.getState(prev);
+			State prevState = (State) memory.getLast();
 			//reward.getReward(prev, currentFeat, agentId);
 			
 			Double val=Double.NEGATIVE_INFINITY;
 			Double maxQ = null;
 			Object action = null;
+			//get action=arg max_{a} and maxQ=max_{a}
 			for(Object o : Q.get(currentState).keySet()){
 				if(Q.get(currentState).get(o) >= val){
 					action = o;
@@ -104,6 +107,7 @@ public class QLearningAgent extends Agent {
 			Map<Object, Double> mapQ = Q.get(prevState);
 			Action actQ = currJointAct.get(agentId);
 			Double Qval = Q.get(prevState).get(currJointAct.get(agentId).getCurrentState());
+			//System.out.println("R("+currO+")="+reward.getReward(curr, currO, agentId));
 			Double newQ =
 			(1-alpha)*Qval +
 			alpha*(reward.getReward(curr, currO, agentId) + gamma*maxQ);
@@ -115,9 +119,9 @@ public class QLearningAgent extends Agent {
 			currentAction.changeToState(policy.getNextAction(action)); 
 			
 			if(alphaDecay.equalsIgnoreCase("POLY"))
-				alpha = 1/(Math.pow((double)round, alpha_decay));
+				alpha = 1/(Math.pow((double)round, polyAlphaDecay));
 			round++;
-
+			memory.offerFirst(currentState);
 		
 		//log.flush();
 	}
@@ -145,8 +149,9 @@ public class QLearningAgent extends Agent {
 		
 		//construct Q table and strategy
 		strategy = new HashMap<State, Object>();
+		State st = null;
 		for (Object ob : stateDomain.getStateSet()) {
-			State st = (State) ob;
+			st = (State) ob;
 			strategy.put(st, currentAction.getCurrentState());
 			//init Q table
 			Map<Object,Double> m = new HashMap<Object, Double>();
@@ -155,6 +160,7 @@ public class QLearningAgent extends Agent {
 			}
 			Q.put(st, m);
 		}
+		memory.offerFirst(st);
 	}
 	
 	public void recordToLogger(ExperimentLogger log){
