@@ -1,3 +1,22 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Enrique Munoz de Cote.
+ * repeatedgames is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * repeatedgames is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with repeatedgames.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * Please send an email to: jemc@inaoep.mx for comments or to become part of this project.
+ * Contributors:
+ *     Enrique Munoz de Cote - initial API and implementation
+ ******************************************************************************/
 package util;
 
 import java.util.ArrayDeque;
@@ -9,16 +28,18 @@ public class OpponentModel {
 		private double stick = 6; //values range from 0 to 6
 		//private Map<Boolean, Double> followIndex = new HashMap<Boolean, Double>();
 		private int strat[];
+		private int agentId;
 		private Vector<Integer> sequence = new  Vector<Integer>();
-		private Deque<Integer> pastActions;
+		private Deque<Integer> pastActions; // this player's actions done in the past, with a window of size CAPACITY
 		private static final int CAPACITY = 10;
 		private static final double GAMMA = 0.05;
 		private static final double RHO = 0.5;
 		private static final double TRESHOLD = (Math.pow(6, RHO)/(1-GAMMA))*0.3; //this is 0.3 from max followIndex, anything bellow this is considered follower
-		private int myLastActions[];
+		private int myLastActions[]; // the leader (e.g. TeamUP) actions done in the past
 		
-		public OpponentModel(int actions){
+		public OpponentModel(int actions, int id){
 			this.numActions = actions;
+			this.agentId = id;
 			strat = new int[numActions];
 			myLastActions = new int[2];
 			java.util.Arrays.fill(strat,0);
@@ -26,6 +47,11 @@ public class OpponentModel {
 			java.util.Arrays.fill(myLastActions,-1);
 		}
 		
+		/**
+		 * records the last action pair
+		 * @param hisAction
+		 * @param myAction
+		 */
 		public void lastAction(int hisAction, int myAction){
 			strat[hisAction]++;
 			sequence.add(hisAction);
@@ -152,5 +178,8 @@ public class OpponentModel {
 		}
 		public int currentAction(){
 			return pastActions.getFirst();
+		}
+		public int getId(){
+			return agentId;
 		}
 }

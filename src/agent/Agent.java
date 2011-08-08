@@ -1,9 +1,31 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Enrique Munoz de Cote.
+ * repeatedgames is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * repeatedgames is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with repeatedgames.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * Please send an email to: jemc@inaoep.mx for comments or to become part of this project.
+ * Contributors:
+ *     Enrique Munoz de Cote - initial API and implementation
+ ******************************************************************************/
 package agent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
 import reward.Reward;
+//import strategy.ExternalRegretMatchingStrategy;
+//import strategy.GIGA;
+//import strategy.InternalRegretMatchingStrategy;
 
 import util.*;
 
@@ -13,7 +35,20 @@ import experiment.ExperimentLogger;
 import experiment.Logger;
 
 
-// This is the agent super class, It holds all the generic fields and methods common it its subclasses 
+/**
+ * An abstract class for strategies which depend only upon
+ * the utility of the action taken and the utility the player 
+ * would have gotten had it taken another strategy.
+ * 
+ * @see ExternalRegretMatchingStrategy
+ * @see InternalRegretMatchingStrategy
+ * @see GIGA
+ * 
+ * This class also provides a random number generator. It is unclear
+ * if this is the best place for it.
+ * @author Enrique Munoz de Cote
+ *
+ */
 public abstract class Agent {
 	protected ObservableEnvInfo currentEnvInfo;
 	protected State currentState;
@@ -21,16 +56,16 @@ public abstract class Agent {
 	protected Action currentAction;
 	protected Reward reward;
 	protected int round = 0;
-	protected IPolicy policy;
+	protected IPolicy policy; // policy= strategy + exploration strategy
 	protected ActionDomain aDomain; 
-	protected Map<State,Object> strategy;
+	protected Map<State,Object> strategy; //this is the strategy of the agent
 	protected int agentId;
 	protected StateMapper stateMapper;
 	protected ExperimentLogger log;
 	
 	public enum Policy
 	{
-	    EGREEDY, BOLTZMAN, RANDOM; 
+	    EGREEDY, BOLTZMAN, RANDOM, _; 
 	}
 	
 	public enum ActionType
@@ -88,7 +123,7 @@ public abstract class Agent {
 		//action
 		switch (ActionType.valueOf(e.getAttribute("actionType"))) {
 		case TWOACTIONS:
-			currentAction = new TwoActions();
+			currentAction = new TwoActions(agentId);
 			break;
 			
 		case NINTACTIONS:	
@@ -115,12 +150,16 @@ public abstract class Agent {
 			System.err.print("\t Boltzman exploration is not yet implemented");
 			break;
 		
-		default:
+		case _:
+			policy = null;
 			break;
 		}
 		
 	}
 	
+	public int getId(){
+		return agentId;
+	}
 	public void constructStructures(ObservableEnvInfo state){
 	}
 	

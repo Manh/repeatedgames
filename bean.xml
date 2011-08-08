@@ -1,7 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (c) 2011 Enrique Munoz de Cote.
+  repeatedgames is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+  
+  repeatedgames is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with repeatedgames.  If not, see <http://www.gnu.org/licenses/>.
+  
+  Please send an email to: jemc@inaoep.mx for comments or to become part of this project.
+  Contributors:
+      Enrique Munoz de Cote - initial API and implementation
+-->
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 <bean id="q-learning" class="agent.QLearningAgent" singleton = "false">
+</bean>
+<bean id="BayesMDP" class="agent.BayesMDP" singleton = "false">
+</bean>
+<bean id="TeamUP" class="agent.TeamUP" singleton = "false">
 </bean>
 <bean id ="coordState" class = "util.CoordinateState">
 </bean>
@@ -9,5 +32,6 @@
 </bean>
 	<bean id="gridEnv" class="environment.GridEnvironment"></bean>
 	<bean id="rNFG" class="reward.NFGReward"></bean>
+	<bean id="gamutGame" class="reward.GamutReward"></bean>
 	<bean id="rnfgEnv" class="environment.NFGEnvironment" singleton = "false"></bean>
 </beans> 

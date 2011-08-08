@@ -1,3 +1,22 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Enrique Munoz de Cote.
+ * repeatedgames is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * repeatedgames is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with repeatedgames.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * Please send an email to: jemc@inaoep.mx for comments or to become part of this project.
+ * Contributors:
+ *     Enrique Munoz de Cote - initial API and implementation
+ ******************************************************************************/
 package agent;
 
 import java.lang.reflect.Method;
@@ -82,8 +101,9 @@ public class QLearningAgent extends Agent {
 	
 	@Override
 	public void update(ObservableEnvInfo curr) {
-		
+		NFGInfo info = (NFGInfo)curr;
 			currentState = (State) stateMapper.getState(curr);
+			//System.out.println(currentState.getFeatures().toString()+", agent:"+this);
 			State prevState = (State) memory.getLast();
 			//reward.getReward(prev, currentFeat, agentId);
 			
@@ -100,15 +120,16 @@ public class QLearningAgent extends Agent {
 			}
 			Vector<Action> currJointAct =  stateMapper.getActions(curr);
 			Vector<Object> currO = new Vector<Object>();
-			for (Action act : currJointAct) 
+			for (Action act : currJointAct) {
 				currO.add(act.getCurrentState());
+			}
 	
-			int currReward = reward.getReward(curr, currO, agentId);
+			double currReward = reward.getReward(curr, currO, agentId);
 			Map<Object, Double> mapQ = Q.get(prevState);
 			Action actQ = currJointAct.get(agentId);
-			Double Qval = Q.get(prevState).get(currJointAct.get(agentId).getCurrentState());
+			double Qval = Q.get(prevState).get(currJointAct.get(agentId).getCurrentState());
 			//System.out.println("R("+currO+")="+reward.getReward(curr, currO, agentId));
-			Double newQ =
+			double newQ =
 			(1-alpha)*Qval +
 			alpha*(reward.getReward(curr, currO, agentId) + gamma*maxQ);
 
@@ -164,15 +185,23 @@ public class QLearningAgent extends Agent {
 	}
 	
 	public void recordToLogger(ExperimentLogger log){
-		log.recordConfig("\n+++ AGENT: " + this.getClass());
-		log.recordConfig("States: " + stateMapper.getClass());
-		log.recordConfig("Action type: " + currentAction.getClass());
-		log.recordConfig("Policy: " + policy.getClass());
-		log.recordConfig("\t alpha: " + alpha);
-		log.recordConfig("\t alpha decay: " + alphaDecay);
-		log.recordConfig("\t gamma: " + gamma);
-		log.recordConfig("\t Q table init: " + Qinit);
-		log.recordConfig("Q-table:\n" + Q.toString());
+		String slog = new String();
+		String ret =	System.getProperty("line.separator");
+		slog = slog.concat("\n+++ AGENT: " + this.getClass()+ret);
+		slog = slog.concat("Action type: " + currentAction.getClass()+ret);
+		slog = slog.concat("Policy: " + policy.getClass()+ret);
+		slog = slog.concat("\t alpha: " + alpha+ret);
+		slog = slog.concat("\t alpha decay: " + alphaDecay+ret);
+		slog = slog.concat("\t gamma: " + gamma+ret);
+		slog = slog.concat("\t Q table init: " + Qinit+ret);
+		//slog.concat("Q-table:\n" + Q.toString());
+		slog = slog.concat("Q-table:" + ret);
+		for (State state : Q.keySet()) {
+			for (Object action : Q.get(state).keySet()) {
+				slog = slog.concat("["+state.getFeatures().toString()+","+action.toString()+"]:"+Q.get(state).get(action)+ret);
+			}
+		}
+		log.recordConfig(slog);
 	}
 	
 	
