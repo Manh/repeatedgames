@@ -1,3 +1,22 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Enrique Munoz de Cote.
+ * repeatedgames is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * repeatedgames is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with repeatedgames.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * Please send an email to: jemc@inaoep.mx for comments or to become part of this project.
+ * Contributors:
+ *     Enrique Munoz de Cote - initial API and implementation
+ ******************************************************************************/
 package experiment;
 
 import java.io.FileWriter;
@@ -79,14 +98,14 @@ public class Experiment {
 			}
 			
 			// create all elements from XML
-			agents = xml.constructAgents();
+			agents = xml.constructAgents(rewards);
 			Vector<Action> jointAction = new Vector<Action>(agents.size());
-			for (Agent agent : agents){
-				agent.init(rewards);
+			for (Agent agent : agents)
 				jointAction.add(agent.getAction());
-			}
+			
 			//get state info to construct agent's structures
 			env = xml.constructEnvironment();
+			env.Init(jointAction);
 			currentState = env.nextEnvInfo(jointAction);
 			for (Agent agent : agents)
 				agent.constructStructures(currentState);
@@ -103,10 +122,10 @@ public class Experiment {
 		log.flushtoConfigFile();
 }
 	
-	public static int[] manyIterations(Vector<Agent> agents, Environment env, int iterations) {
+	public static double[] manyIterations(Vector<Agent> agents, Environment env, int iterations) {
 		
-		int[] totUtil = new int[2]; 
-		int[] runUtil = new int[2];
+		double[] totUtil = new double[agents.size()]; 
+		double[] runUtil = new double[agents.size()];
 		int totIterations = iterations;
 		while (iterations>0){
 			iterations = iterations - 1;
@@ -120,7 +139,7 @@ public class Experiment {
 		return totUtil;
 	}
 	  
-	public static int[] oneIteration(Vector<Agent> agents, Environment env){
+	public static double[] oneIteration(Vector<Agent> agents, Environment env){
 		Vector<Action> jointAction = new Vector<Action>(agents.size());
 		Vector<Object> jointActionString = new Vector<Object>(agents.size());
 
@@ -131,11 +150,10 @@ public class Experiment {
 		}
 
 		// 2) get environmental change (foe state perceptions for agents)
-		// prevState = currentState;
 		currentState = env.nextEnvInfo(jointAction);
-		int[] instReward = rewards.getRewards(currentState,jointAction);
+		double[] instReward = rewards.getRewards(currentState,jointAction);
 		log.recordActions(jointActionString);
-		//System.out.println(jointActionString);
+		//System.out.println("State:"+jointActionString);
 		// 3) update agents
 		for(Agent agent: agents)
 			agent.update(currentState);

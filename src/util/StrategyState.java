@@ -1,3 +1,22 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Enrique Munoz de Cote.
+ * repeatedgames is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * repeatedgames is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with repeatedgames.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * Please send an email to: jemc@inaoep.mx for comments or to become part of this project.
+ * Contributors:
+ *     Enrique Munoz de Cote - initial API and implementation
+ ******************************************************************************/
 /**
  * 
  */
@@ -33,7 +52,7 @@ public  class StrategyState extends State<Strategy,Strategy> {
 		experience = new HashMap<Strategy, Integer>(strategySet.size());
 		for (Iterator<Strategy> iterator = strategySet.iterator(); iterator.hasNext();) {//for all actions
 			Strategy strat = (Strategy) iterator.next();
-			HashMap<State,Integer> nextState = new HashMap<State,Integer>(1);
+			HashMap<State<Strategy,Strategy>,Integer> nextState = new HashMap<State<Strategy,Strategy>,Integer>(1);
 			nextState.put(s0, 1);
 			T.put(strat, nextState);
 			reward.put(strat, Rmax/(1-GAMMA));
@@ -68,6 +87,7 @@ public  class StrategyState extends State<Strategy,Strategy> {
 		else
 			T.get(strat).put(state, T.get(strat).get(state)+1);
 		//this should be an (exponential) average
+		//TODO: check this update
 		double p = (1-GAMMA) *reward.get(strat) + GAMMA * r;
 		reward.put(strat, p);
 		experience.put(strat, experience.get(strat)+1);

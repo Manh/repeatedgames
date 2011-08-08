@@ -1,3 +1,22 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Enrique Munoz de Cote.
+ * repeatedgames is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * repeatedgames is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with repeatedgames.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * Please send an email to: jemc@inaoep.mx for comments or to become part of this project.
+ * Contributors:
+ *     Enrique Munoz de Cote - initial API and implementation
+ ******************************************************************************/
 package experiment;
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -174,7 +193,7 @@ public class ExperimentLogger {
 	    }
 	}
 	
-	public void recordUtils(int[] utils, int iter){
+	public void recordUtils(double[] utils, int iter){
 		int i = 0;
 		//content.setLength(0);
 		for (i=0;i<utils.length;i++) {
@@ -199,18 +218,18 @@ public class ExperimentLogger {
 		*/
 	}
 	
-	public void recordMean(int[] utils, int iter){
+	public void recordMean(double[] utils, int iter){
 		content.append("Total utility: ");
 		int i = 0;
 		//content.setLength(0);
 		for (i=0;i<utils.length;i++) {
-			Integer n = utils[i];
-			Double util = n.doubleValue()/iter;
+			double n = utils[i];
+			Double util = n/iter;
 			content.append(util.toString() + "\t");
 			//content.append("\t" + stateCount[i] + ret);
 		}
 		content.append(ret);
-		config.append(ret);
+		//config.append(ret);
 	}
 
 	public void recordActions(Vector<Object> act){
