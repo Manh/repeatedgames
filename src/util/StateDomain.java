@@ -24,7 +24,8 @@ import java.util.Vector;
 /**
  * @author Enrique Munoz de Cote
  *
- * This is the abstract class StateDomain. 
+ * This is the abstract class StateDomain. Implementations of this class instantiate
+ *  all the possible different state (of subtype State)
  * @param T a subclass of state
  */
 public abstract class StateDomain<State> {

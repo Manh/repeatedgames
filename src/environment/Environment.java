@@ -19,17 +19,12 @@
  ******************************************************************************/
 package environment;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Vector;
 
-import agent.Agent;
-
-import util.Action;
-import util.JointActionState;
 import util.ObservableEnvInfo;
-import util.State;
-import util.StateSet;
+import util.ReadXml;
+
+import org.w3c.dom.Element;
 
 
 
@@ -59,4 +54,9 @@ public interface Environment<A> {
 	 * @param actions
 	 */
 	public void Init(Vector<A> actions);
+	
+	/**
+	 * @param e
+	 */
+	public void Init(ReadXml xml);
 }

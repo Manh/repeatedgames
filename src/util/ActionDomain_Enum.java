@@ -19,44 +19,40 @@
  ******************************************************************************/
 package util;
 
+
 import java.util.Vector;
-
 /**
- * @author Enrique Munoz de Cote
- *
+ * @author aladdinagentschool
+ *This is a subclass of ActionDomain, this class can be implemented. it creates a domain of all possible enum actions
+ * 
  */
-public class NFGInfo implements ObservableEnvInfo {
-	protected Object[] jointO;
-	private Vector<Action> jointAction = new Vector();
-	
-	public NFGInfo(){
-	}
-	
-	public NFGInfo(Vector<Action> j){
-		Init(j);
-	}
-	
-	public Vector<Action> currentJointAction(){
-		
-		for (int i = 0; i < jointO.length; i++) {
-			jointAction.get(i).changeToState(jointO[i]);
-		}
-
-		return jointAction;
-	}
-	
-	public void updateJointAction(Vector<Action> j){
-		for (int i = 0; i < j.size(); i++) {
-			jointO[i] = j.get(i).getCurrentState();
-		}
-	}
-	
-	public void Init(Vector<Action> j){
-		jointO = new Object[j.size()];
-		
-		for (int i = 0; i < j.size(); i++) {
-			jointO[i] = j.get(i).getCurrentState();
-			jointAction.add(j.get(i).newInstance());
-		}
+public class ActionDomain_Enum extends ActionDomain {
+	//constructor
+	public ActionDomain_Enum(){
+		Action One = new Action_Enum (1);
+		Action Two = new Action_Enum (2);
+		Action Three = new Action_Enum (3);
+		Action Four = new Action_Enum (4);
+		Action Five = new Action_Enum (5);
+		Action Six = new Action_Enum (6);
+		Action Seven = new Action_Enum (7);
+		Action Eight = new Action_Enum (8);
+		Action Nine = new Action_Enum (9);
+		Action Ten = new Action_Enum (10);
+		Action Eleven = new Action_Enum (11);
+		Action Twelve = new Action_Enum (12);
+		actionSet = new Vector<Object>();
+		actionSet.add(One);
+		actionSet.add(Two);
+		actionSet.add(Three);
+		actionSet.add(Four);
+		actionSet.add(Five);
+		actionSet.add(Six);
+		actionSet.add(Seven);
+		actionSet.add(Eight);
+		actionSet.add(Nine);
+		actionSet.add(Ten);
+		actionSet.add(Eleven);
+		actionSet.add(Twelve);
 	}
 }

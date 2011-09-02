@@ -18,7 +18,24 @@
  *     Enrique Munoz de Cote - initial API and implementation
  ******************************************************************************/
 package util;
-// not yet implemented
-public class LemonadeReward {
 
+
+import java.util.Vector;
+
+
+/**
+* @author aladdinagentschool
+*This is a subclass of ActionDomain, this class can be implemented. it creates a domain of all possible gridactions
+* 
+*/
+public class ActionDomain_Grid extends ActionDomain {
+	
+	public ActionDomain_Grid(){
+		actionSet = new Vector();
+		actionSet.add("right");
+		actionSet.add("left");
+		actionSet.add("up");
+		actionSet.add("down");
+		actionSet.add("put");	
+	}
 }

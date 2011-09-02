@@ -17,25 +17,17 @@
  * Contributors:
  *     Enrique Munoz de Cote - initial API and implementation
  ******************************************************************************/
-/**
- * 
- */
 package util;
 
-import java.util.Vector;
-
 /**
- * @author Enrique Munoz de Cote
- *
+ * @author aladdinagentschool
+ * subclass od generic type action
+ * not yet been inplemented
  */
-public interface ObservableEnvInfo {
+public class Action_LeaderFollower extends Action {
 	
-	public Vector<Action> currentJointAction();
 	
-	/**
-	 * This should get all relevant state info BUT the joint actions (there's a method for that)
-	 * @return all relevant state info
-	 */
-	public Vector<Object> currentState();
-
+	Action_LeaderFollower(){ 
+	super ();
+	}
 }

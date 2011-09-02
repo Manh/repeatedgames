@@ -19,15 +19,47 @@
 -->
 <Test>
 <Environment>
-<Type rewardType="rNFG" game="PD" environment="rnfgEnv">
+<!-- this describe a grid environment, coordinates are of the form:
+	x,y and the range of each start at 0 --> 
+<Type environment="grid" rewardType="gridRewards" columns="3" rows="3" collisionVal="-10">
+	<Coins>
+		<Coin>
+			<Coordinate>1,2</Coordinate>
+			<Value>10</Value>
+		</Coin>
+	</Coins>	
+	<!--  
+	<Pods>
+		<Pod>
+			<Coordinate>2,1</Coordinate>
+			<Value>-1</Value>
+		</Pod>
+	</Pods>
+	-->
+	<XWalls>
+	<!-- Xwalls are horizontal walls, there are rows-1 number of x coordinates and cols number of y coordinates-->
+		<Wall>
+			<Coordinate>0,0</Coordinate>
+			<Size>1</Size>
+			<Value>0</Value><!--this value [0,1] makes a semiwall crossable --> 
+		</Wall>
+		<Wall>
+			<Coordinate>0,2</Coordinate>
+			<Size>2,0</Size> 
+			<Value>0</Value><!--this value [0,1] makes a semiwall crossable --> 
+		</Wall>
+	</XWalls>
 </Type>
+
+
+
 <Players><Player>
 	<q-learning epsilon="0.1" epsilonDecay="POLY" alpha="0.1" 
-		alphaDecay="_" gamma="0.95" policy="EGREEDY" name="q-learning" actionType="NINTACTIONS" numActions="2" stateType="JOINTACTIONS" Qinit="0">
+		alphaDecay="_" gamma="0.95" policy="EGREEDY" name="q-learning" actionType="GRID" numActions="2" stateType="JOINTACTIONSGRID" Qinit="0">
 	</q-learning></Player>
   <Player>
 	<q-learning epsilon="0.1" epsilonDecay="POLY" alpha="0.1"
-		alphaDecay="_" gamma="0.95" policy="EGREEDY" name="q-learning" actionType="NINTACTIONS" numActions="2" stateType="JOINTACTIONS" Qinit="0">
+		alphaDecay="_" gamma="0.95" policy="EGREEDY" name="q-learning" actionType="GRID" numActions="2" stateType="JOINTACTIONSGRID" Qinit="0">
 	</q-learning></Player>
 </Players>
 </Environment>

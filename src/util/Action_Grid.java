@@ -17,25 +17,45 @@
  * Contributors:
  *     Enrique Munoz de Cote - initial API and implementation
  ******************************************************************************/
-/**
- * 
- */
 package util;
 
-import java.util.Vector;
-
 /**
- * @author Enrique Munoz de Cote
- *
- */
-public interface ObservableEnvInfo {
+* @author aladdinagentschool
+*This is a subclass of ActionDomain, this class can be implemented. // Class with the types of grid actions.
+* 
+*/
+public class Action_Grid extends Action  {
+/*	
+	public static Action_Grid right = new Action_Grid ("right");
+	public static Action_Grid left = new Action_Grid ("left");
+	public static Action_Grid up = new Action_Grid ("up");
+	public static Action_Grid down = new Action_Grid ("down");
+	*/
 	
-	public Vector<Action> currentJointAction();
-	
-	/**
-	 * This should get all relevant state info BUT the joint actions (there's a method for that)
-	 * @return all relevant state info
-	 */
-	public Vector<Object> currentState();
 
+	// constructors
+	public Action_Grid (String name){
+		actionName= name;
+		domain = new ActionDomain_Grid();
+		changeToState(name);
+	}
+
+	// constructors
+	public Action_Grid (){
+		domain = new ActionDomain_Grid();
+		changeToState(domain.getFirstAction());
+	}
+	
+	public Action_Grid(int id){
+		agentId = id; 
+		domain = new ActionDomain_Grid();
+		changeToState(domain.getFirstAction());
+	}
+	
+	public Action_Grid newInstance(){
+		return new Action_Grid(agentId);
+	}
+	
 }
+
+

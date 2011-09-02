@@ -19,172 +19,178 @@
  ******************************************************************************/
 package environment;
 
-
 import java.util.HashMap;
-
-import java.util.Iterator;
 import java.util.Map;
-
-
+import java.util.Random;
 import java.util.Vector;
 
-import agent.Agent;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
+import agent.Agent.ActionType;
 
 import util.Action;
-import util.CoordinateState;
-import util.GridStateDomain;
-import util.JointActionState;
-import util.State;
-import util.StateDomain;
- 
-// sets the grid Environment for the game and also fills the Transition function
-// it is a subclass of the generic environment and it can be implemented.
-public class GridEnvironment implements Environment {
-	int []coordinate; 
-	int rows;
-	int columns;
-	int []coinValue;
-
-	// Initializes the environment
-	public GridEnvironment (Vector<Agent> players, int r, int c){
-		System.out.println("initializing gridEnvironment");
+import util.Action_Grid;
+import util.Coordinate;
+import util.Info_Grid;
+import util.ObservableEnvInfo;
+import util.ReadXml;
+/**
+ * @author Enrique Munoz de Cote
+ * Here's where the way the world behaves lies. It includes several attributes specific of grid domains
+ */
+//TODO: fix the starting position to be read from xml
+public class GridEnvironment implements Environment<Action> {
+	private Info_Grid envInfo;
+	private int cols = 0;
+	private int rows = 0;
+	private Vector<Coordinate> jointCoord = new Vector<Coordinate>();
+	protected Random random = new Random();
+	public enum ActionType
+	{
+	    up, down, left, right, put; 
+	}
+	
+	//walls
+	Map<int[],Float> xWalls = new HashMap<int[],Float>();
+	//walls
+	Map<int[],Float> yWalls = new HashMap<int[],Float>();
+	
+	
+	public GridEnvironment(){
+		envInfo = new Info_Grid();
+	}
+	
+	public GridEnvironment(Vector<Action> jointAction) {
+		envInfo = new Info_Grid(jointAction);
+	}
+	
+	@Override
+	public ObservableEnvInfo nextEnvInfo(Vector<Action> actions) {
+		envInfo.updateJointAction(actions);
 		
-		this.rows = r;
-		this.columns = c;
-		
-		JointActionState jointAct = new JointActionState(players.capacity());
-		
-		
-		//calls the state domain class and init the state domain
-		
-		Vector <Vector<Action>>allJointActs;
-		
-		allJointActs = new Vector<Vector<Action>>();
-		GridStateDomain domain = new GridStateDomain(rows, columns, players.capacity());
-		
-		// creates a vector of all the joint actions.
-		allJointActs =	jointAct.allJointActions;
-		
-		
-		Map<State, Integer> reward ;
-		
-		
-		
-		//iterate over all joint actions
-		for(Iterator itr1 = allJointActs.iterator(); itr1.hasNext();){
+		Vector<Coordinate> coords = new Vector<Coordinate>();
+		for (int i = 0; i < actions.size(); i++) {
+			Action_Grid action = (Action_Grid)actions.get(i);
+			Coordinate coord = jointCoord.get(i);
+			Coordinate tmp;
 			
-			JointActionState jointAction = new JointActionState(players.capacity());
-			jointAction.setJointAction((Vector<Action>) itr1.next());
-			
-			reward = new HashMap <State, Integer>();
-					
-			// Calculates the no of possible states, i.e the size of the state domain
-			int n = rows* columns;
-			int factn = factorial(n);
-			int factr = factorial (n-players.capacity());
-			int noofperm = factn/factr;
-			
-
-			//System.out.println("no of perm" + noofperm);
-			
-			
-			// Iterate over all the possible states.
-			for (int j=0; j<noofperm; j++){
-				GridStateDomain domain1 = new GridStateDomain ( rows, columns, players.capacity());
-			
-				Vector<CoordinateState> set = new Vector<CoordinateState>();
+			switch (ActionType.valueOf((String)action.getCurrentState())) {
+			case up:
+				if((coord.getCurrentState()[0] + 1) < rows || !xWalls.containsKey(coord.getCurrentState()))
+					coord.changeToState(0, coord.getCurrentState()[0] + 1);
+				break;
 				
+			case down:
+				tmp = coord;
+				tmp.changeToState(0,tmp.getCurrentState()[0] -1);
+				if((coord.getCurrentState()[0] -1) > -1 || !xWalls.containsKey(tmp))
+					coord.changeToState(0,coord.getCurrentState()[0] - 1);
+				break;
 				
-				set.add(domain1.domain.get(j));
+			case right:
+				if((coord.getCurrentState()[1] + 1) < cols || !yWalls.containsKey(coord))
+					coord.changeToState(1,coord.getCurrentState()[1] + 1);
+				break;
 				
-					CoordinateState state = new CoordinateState();
-					state = (CoordinateState) set.get(0); //itrset.next();
-				
-			
-				//System.out.println(state.features.get(0));
-				
-				
-				
-				
-				
-				CoordinateState nxtState = new CoordinateState();
-				
-				
-				// for each joint action get next state
-				nxtState = state.getNextState(jointAction, state);
-				
-				
-				
-				
-				// check next state with state domain
-				Vector<CoordinateState> set1 = domain1.getStateSet();
-				
-				boolean end = false;			
-				
-				for (Iterator itrset1 = set1.iterator(); itrset1.hasNext();){
-					CoordinateState comp = new CoordinateState();
-					comp = (CoordinateState) itrset1.next();
-					
-					
-					boolean result = comp.compareState(comp, state);
-					
-					if (result){
-						end = true;
-						break;
-						
-					}			
-				}
-				
-				if (end){
-					
-					reward.put(state, 1);
-				
-				}
-				else {
-					
-					reward.put(state, 0);
-				}
-				
-		 	}
-			//jointAct.T.put(jointAction,reward);
-						
+			case left:
+				tmp = coord;
+				tmp.changeToState(1,tmp.getCurrentState()[1] -1);
+				if((coord.getCurrentState()[1] -1) > -1 || !yWalls.containsKey(tmp))
+					coord.changeToState(1,coord.getCurrentState()[1] - 1);
+				break;
+			}
+			coords.add(coord);
 		}
 		
-		
+		//now check for collisions
+		Vector<Integer> collision = new Vector<Integer>();
+		for (int i = 0; i < actions.size(); i++) {
+			Coordinate coord = coords.get(i);
+			collision.add(i);
+			for (int k = 0; k < actions.size(); k++) {
+				if(coords.get(k).getCurrentState() == coord.getCurrentState() && i!=k){
+					collision.add(k);
+				}	
+			}
+			if(collision.size() > 1){
+				int randomA = random.nextInt(collision.size());//choose one agent randomly
+				for (int k = 0; k < collision.size(); k++) {
+					if(k != randomA){//the agent chosen randomly will stay in its new coordinates, the rest should return
+						coords.remove(collision.get(k));
+						coords.add(collision.get(k), jointCoord.get(collision.get(k)));
+					}
+				}
+			}
+			collision.clear();
+		}
+		jointCoord = coords;
+		envInfo.updateJointCoord(coords);
+		return envInfo;
 	}
-		
-			
-	
-
-	// finds the factorial of a given no.
-	
-	public static int factorial( int n )
-    {
-        if( n <= 1 )     // base case
-            return 1;
-        else
-            return n * factorial( n - 1 );
-    }
-
-
-
 
 	@Override
-	public State currentState() {
-		// TODO Auto-generated method stub
-		return null;
+	public ObservableEnvInfo currentEnvInfo() {
+		return envInfo;
 	}
-
-
-
 
 	@Override
-	public State nextState(State prevState, Vector<Action>) {
-		// TODO Auto-generated method stub
-		return null;
+	public void Init(Vector<Action> actions) {
+		envInfo.Init(actions);
+	}
+
+	@Override
+	public void Init(ReadXml xml) {
+		cols = Integer.parseInt(xml.getTagAttribute("Type", "columns"));
+		rows = Integer.parseInt(xml.getTagAttribute("Type", "rows"));
+		System.out.println("Grid: "+ cols + " x " + rows );
+		
+		//put the agents in the environment
+		int[] coord = new int[2];
+		Coordinate coord1 = new Coordinate(rows,cols);
+		Coordinate coord2 = new Coordinate(rows,cols);
+		coord[0]=0; coord[1]=0;
+		coord1.changeToState(coord);
+		jointCoord.add(coord1);
+		coord[0]=0; coord[1]=2;
+		coord2.changeToState(coord);
+		jointCoord.add(coord2);
+		envInfo.updateJointCoord(jointCoord);
+		
+		//build walls
+		NodeList wallList;
+		String splitCoordinate[]  = new String[2];
+		//build Xwalls
+		wallList = xml.getElementsByTagName("XWalls");
+		for (int i = 1; i < wallList.getLength(); i++) {
+			NodeList list = wallList.item(i).getChildNodes();
+			System.out.println(list.getLength());
+			Element wall = (Element) list.item(1);
+			splitCoordinate = xml.getTextValue (wall, "Coordinate").split("\\,");
+			int[] wcoord= new int[2];
+			wcoord[0] = Integer.parseInt(splitCoordinate[0]);
+			wcoord[1] = Integer.parseInt(splitCoordinate[1]);
+			for (int j = 0; j < xml.getIntValue(wall, "Size"); j++) {
+				xWalls.put(wcoord, xml.getFloatValue(wall, "Value"));
+				wcoord[0] = wcoord[1] + 1;
+			}
+		}
+		//build Ywalls
+		wallList = xml.getElementsByTagName("YWalls");
+		for (int i = 0; i < wallList.getLength(); i++) {
+			NodeList list = wallList.item(i).getChildNodes();
+			Element wall = (Element) list.item(1);
+			splitCoordinate = xml.getTextValue (wall, "Coordinate").split("\\,");
+			int[] wcoord= new int[2];
+			wcoord[0] = Integer.parseInt(splitCoordinate[0]);
+			wcoord[1] = Integer.parseInt(splitCoordinate[1]);
+			for (int j = 0; j < xml.getIntValue(wall, "Size"); j++) {
+				yWalls.put(wcoord, xml.getFloatValue(wall, "Value"));
+				wcoord[1] = wcoord[1] + 1;
+			}
+		}
+		
 	}
 	
-	
-	
-	
+
 }

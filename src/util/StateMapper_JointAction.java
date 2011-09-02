@@ -27,27 +27,27 @@ import java.util.Vector;
  * @author Enrique Munoz de Cote
  *
  */
-public class JointActionStateMapper extends StateMapper<JointActionState> {
+public class StateMapper_JointAction extends StateMapper<State_JointAction> {
 	
-	public JointActionStateMapper(){
+	public StateMapper_JointAction(){
 	}
 
 	@Override
 	public void init(ObservableEnvInfo info){
-		NFGInfo state = (NFGInfo) info;
+		Info_NFG state = (Info_NFG) info;
 		Vector<Action> vectA = state.currentJointAction();
 		Vector<Action> vectB = new Vector();
 		Action a0 = vectA.get(0).newInstance();
 		Action a1 = vectA.get(1).newInstance();
 		vectB.add(a0); vectB.add(a1);
-		stateDomain = new JointActionStateDomain(state.currentJointAction());
+		stateDomain = new StateDomain_JointAction(state.currentJointAction());
 
-		for (JointActionState st : stateDomain.getStateSet()) {
+		for (State_JointAction st : stateDomain.getStateSet()) {
 			mapping.put(st.getFeatures(),st);
 		}
 	}
 	
-	public JointActionState getState(NFGInfo info){
+	public State_JointAction getState(Info_NFG info){
 		Vector<Action> vectA = info.currentJointAction();
 		Vector<Object> vectO = new Vector<Object>();
 		for (Action action : vectA) {
@@ -58,8 +58,8 @@ public class JointActionStateMapper extends StateMapper<JointActionState> {
 	}
 	
 	@Override
-	public JointActionState getState(ObservableEnvInfo info){
-		NFGInfo state = (NFGInfo) info;
+	public State_JointAction getState(ObservableEnvInfo info){
+		Info_NFG state = (Info_NFG) info;
 		Vector<Action> vectA = state.currentJointAction();
 		Vector<Object> vectO = new Vector<Object>();
 		for (Action action : vectA) {
@@ -71,7 +71,7 @@ public class JointActionStateMapper extends StateMapper<JointActionState> {
 	
 	@Override
 	public Vector<Action> getActions(ObservableEnvInfo info){
-		NFGInfo state = (NFGInfo) info;
+		Info_NFG state = (Info_NFG) info;
 		return state.currentJointAction();
 	}
 	

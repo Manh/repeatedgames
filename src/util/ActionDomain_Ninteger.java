@@ -19,15 +19,25 @@
  ******************************************************************************/
 package util;
 
+import java.util.Vector;
+
 /**
- * @author aladdinagentschool
- * subclass od generic type action
- * not yet been inplemented
+ * This class gets the domain of the Action variable, it should NOT construct the Actions itself
+ * @author Enrique Munoz de Cote
+ *
  */
-public class LeaderFollowerActions extends Action {
+public class ActionDomain_Ninteger extends ActionDomain {
 	
-	
-	LeaderFollowerActions(){ 
-	super ();
+	/**
+	 * Generates a domain of size numberActions [0,numberActions-1]
+	 * @param numberActions the size of the domain
+	 */
+	public ActionDomain_Ninteger(int numberActions){
+		
+		actionSet = new Vector(numberActions);
+		for (int i = 0; i < numberActions; i++) {
+			actionSet.add(i);
+		}
 	}
+
 }

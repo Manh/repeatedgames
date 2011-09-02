@@ -22,27 +22,27 @@
  */
 package environment;
 
-import java.util.Map;
 import java.util.Vector;
 
+import org.w3c.dom.Element;
+
 import util.Action;
-import util.JointActionState;
-import util.NFGInfo;
+import util.Info_NFG;
 import util.ObservableEnvInfo;
-import util.State;
+import util.ReadXml;
 
 /**
  * @author enrique
  */
 public class NFGEnvironment implements Environment<Action> {
-	NFGInfo envInfo;
+	Info_NFG envInfo;
 	
 	public NFGEnvironment(Vector<Action> jointAction){
-		envInfo = new NFGInfo(jointAction);
+		envInfo = new Info_NFG(jointAction);
 	}
 	
 	public NFGEnvironment(){
-		envInfo = new NFGInfo();
+		envInfo = new Info_NFG();
 	}
 
 	@Override
@@ -59,6 +59,12 @@ public class NFGEnvironment implements Environment<Action> {
 	@Override
 	public void Init(Vector<Action> actions) {
 		envInfo.Init(actions);
+	}
+
+	@Override
+	public void Init(ReadXml xml) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
