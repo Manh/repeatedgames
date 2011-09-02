@@ -19,25 +19,48 @@
  ******************************************************************************/
 package util;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 /**
- * This class gets the domain of the Action variable, it should NOT construct the Actions itself
- * @author Enrique Munoz de Cote
- *
+ * @author aladdinagentschool
+ * subclass of generic type State, and can be implemented. It holds all the generic fields and methods common it its subclasses 
+ * it hold all the joint action of the agents. It also creates a domain of all possible joint action. , it has both get and set methods
+ * to access the private fields
  */
-public class NintegerActionDomain extends ActionDomain {
-	
-	/**
-	 * Generates a domain of size numberActions [0,numberActions-1]
-	 * @param numberActions the size of the domain
-	 */
-	public NintegerActionDomain(int numberActions){
-		
-		actionSet = new Vector(numberActions);
-		for (int i = 0; i < numberActions; i++) {
-			actionSet.add(i);
-		}
-	}
 
+
+public class  State_JointAction extends State{
+	// actionssSet is the list of actions of the agents in the game, 
+	private static Vector<Object> jointAction;
+	
+	public State_JointAction(){
+		super();
+	}
+	
+	//Constructor
+	public State_JointAction (Vector<Action> actions){
+		jointAction = new Vector<Object>();
+		init(actions);
+	}
+	
+	public void init(Vector<Action> actions){
+		for (Action action : actions) {
+			jointAction.add(action.getCurrentState());
+		}
+		domain = new StateDomain_JointAction(actions);
+	}
+	
+	public Vector<Object> getJointAction(){
+		return jointAction;
+	}
+	
+	public String name (Action a){
+		return a.getName();
+	}
+	
 }
+
+

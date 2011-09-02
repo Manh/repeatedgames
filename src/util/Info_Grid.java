@@ -19,51 +19,52 @@
  ******************************************************************************/
 package util;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 
 /**
- * @author aladdinagentschool
- * subclass of generic type State, and can be implemented. It holds all the generic fields and methods common it its subclasses 
- * it hold all the joint action of the agents. It also creates a domain of all possible joint action. , it has both get and set methods
- * to access the private fields
+ * @author enrique
+ *
  */
-
-
-public class  JointActionState extends State{
-	// actionssSet is the list of actions of the agents in the game, 
-	private static Vector<Object> jointAction;
+public class Info_Grid extends Info_NFG{
+	protected Object[] jointC;
+	private Vector<Coordinate> jointCoord = new Vector();
 	
-	public JointActionState(){
+	public Info_Grid(){
 		super();
 	}
 	
-	//Constructor
-	public JointActionState (Vector<Action> actions){
-		jointAction = new Vector<Object>();
-		for (Action action : actions) {
-			jointAction.add(action.getCurrentState());
+	public Info_Grid(Vector<Action> j){	
+		super(j);
+	}
+	
+	public void updateJointAction(Vector<Action> j){
+		for (int i = 0; i < j.size(); i++) {
+			jointO[i] = j.get(i).getCurrentState();
 		}
-		domain = new JointActionStateDomain(actions);
 	}
 	
-	public void init(Vector<Action> actions){
-		for (Action action : actions) {
-			jointAction.add(action.getCurrentState());
+	
+	public void updateJointCoord(Vector<Coordinate> j){
+		jointCoord = j;
+	}
+	
+	public Vector<Coordinate> currentJointCoord(){
+		return jointCoord;
+	}
+	
+	public Vector<int[]> currentArrayJointCoord(){
+		Vector<int[]> a = new Vector<int[]>();
+		for (int i = 0; i < jointCoord.size(); i++) {
+			a.add(jointCoord.get(i).getCurrentState());
 		}
-		domain = new JointActionStateDomain(actions);
+		return a;
 	}
 	
-	public Vector<Object> getJointAction(){
-		return jointAction;
+	public Vector<Object> currentState(){
+		Vector<Object> o = new Vector<Object>();
+		for (Coordinate c : jointCoord) {
+			o.add(c.getCurrentState());
+		}
+		return o;
 	}
-	
-	public String name (Action a){
-		return a.getName();
-	}
-	
 }
-
-

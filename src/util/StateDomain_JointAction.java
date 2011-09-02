@@ -36,9 +36,9 @@ import agent.QLearningAgent;
  *subclass of  generic type statedomain, can be implemented. It holds all the generic fields and methods common it its subclasses 
  *it creates the grid domain 
  */
-public class JointActionStateDomain extends StateDomain<JointActionState> {
+public class StateDomain_JointAction extends StateDomain<State_JointAction> {
 	
-	private Map<Vector<Object>,JointActionState> mapping;
+	private Map<Vector<Object>,State_JointAction> mapping;
 	private int numAgents = 0;
 	private int numStates = 0;
 	private int[] agentsActions;
@@ -46,11 +46,13 @@ public class JointActionStateDomain extends StateDomain<JointActionState> {
 	/**
 	 * @param actions
 	 */
-	public JointActionStateDomain (Vector<Action> actions){
-		domain = new LinkedHashSet<JointActionState>();
-		mapping = new HashMap<Vector<Object>, JointActionState>();
+	public StateDomain_JointAction (Vector<Action> actions){
+		domain = new LinkedHashSet<State_JointAction>();
+		mapping = new HashMap<Vector<Object>, State_JointAction>();
 		numAgents = actions.size();
 		agentsActions = new int[numAgents];
+		
+		//linearize the state space 
 		int numberOfOutcomes = 1;
 		  for (int i = 0; i < numAgents; i++){
 			  agentsActions[i] = actions.get(i).getDomainSet().size();
@@ -59,8 +61,8 @@ public class JointActionStateDomain extends StateDomain<JointActionState> {
 		  numStates = numberOfOutcomes;
 		
 		for (int i = 0; i < numberOfOutcomes; i++) {
-			JointActionState state = new JointActionState();
-			int[] jointAct = toActions(i);
+			State_JointAction state = new State_JointAction();
+			int[] jointAct = toActions(i);//transform the linearized version into the vector version
 			for (int j = 0; j < jointAct.length; j++) 
 				state.addFeature(jointAct[j]);
 			domain.add(state);
@@ -70,7 +72,7 @@ public class JointActionStateDomain extends StateDomain<JointActionState> {
 
 	
 // get state domain		
-	public Set<JointActionState> getStateSet(){
+	public Set<State_JointAction> getStateSet(){
 		return domain;	
 	}	
 // returns size of the domain	
@@ -83,10 +85,10 @@ public class JointActionStateDomain extends StateDomain<JointActionState> {
 	 * @param info the info coming from the environment
 	 * @return
 	 */
-	public JointActionState getState(ObservableEnvInfo e){
+	public State_JointAction getState(ObservableEnvInfo e){
 		String s = e.getClass().toString();
-		if(s.equals("class util.NFGInfo")){
-			NFGInfo nfg = (NFGInfo) e;
+		if(s.equals("class util.Info_NFG")){
+			Info_NFG nfg = (Info_NFG) e;
 			Vector<Action> vectA = nfg.currentJointAction();
 			Vector<Object> vectO = new Vector<Object>();
 			for (int i=0; i< vectA.size(); i++) {

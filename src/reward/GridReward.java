@@ -19,99 +19,171 @@
  ******************************************************************************/
 package reward;
 
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Vector;
 
-import org.xml.sax.SAXException;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
-import util.CoordinateState;
+import util.Action;
+import util.Info_Grid;
+import util.ObservableEnvInfo;
+import util.ReadXml;
 import util.State;
-import util.readxmlv2;
 
-//
 /**
- * @author aladdinagentschool
- *extension of generic type reward. this clss can be implemented. Uses xml file to set the reward function and had method to get the rewards for coins, pods
+ * @author enrique
+ *
  */
-public class GridReward extends Reward{
+public class GridReward implements Reward {
+
+	/**
+	 * This class implements the most generic reward function for grid, specializations should inherit from here
+	 */
 	
-	public Map<CoordinateState , Integer> coins ;
-	public Map <CoordinateState, Integer> puds;
-	public int collisionVal;
-	int coinvalue;
-	int podvalue;
+	//coins
+	HashMap<Vector<Integer>,Float> coins = new HashMap<Vector<Integer>,Float>();
 	
-	// generates the reward function
-	public GridReward (Reward rew) {
-		
-		String cCoordinate = readxmlv2.getcCoordinate();
-		
-		int coinValue = readxmlv2.getcoins();
-		coinvalue = coinValue;
-		String splitCoordinate[]  = new String[2];
-		splitCoordinate = cCoordinate.split("\\,");
-		
-		
-		Vector<Integer>ccoordinate;
-		ccoordinate = new Vector<Integer>(2);
-		ccoordinate.add(Integer.parseInt(splitCoordinate[0]));
-		ccoordinate.add(Integer.parseInt(splitCoordinate[1]));
-		Map<Reward, Vector<Integer>> cfeature =new HashMap<Reward, Vector<Integer>>();
-		cfeature.put(rew, ccoordinate);
-		CoordinateState cstate = new CoordinateState (cfeature);
-		coins = new HashMap <CoordinateState , Integer>();
-		coins.put(cstate, coinValue);
-		
-		String pCoordinate = readxmlv2.getpCoordinate();
-		podvalue = coinValue;
-		String pudCoordinate[]  = new String[2];
-		pudCoordinate = pCoordinate.split("\\,");
-		Vector<Integer>pcoordinate= new Vector<Integer>(2);
-		pcoordinate.add(Integer.parseInt(splitCoordinate[0]));
-		pcoordinate.add(Integer.parseInt(splitCoordinate[1]));
-		Map<Reward, Vector<Integer>> pfeature =new HashMap<Reward, Vector<Integer>>();
-		pfeature.put(rew, ccoordinate);
-		CoordinateState pstate = new CoordinateState (pfeature);
-		puds = new HashMap <CoordinateState , Integer>();
-		puds.put(pstate, coinValue);
+	//puds
+	HashMap<Vector<Integer>,Float> puds = new HashMap<Vector<Integer>,Float>();
 	
+	private int collisionVal = 0;
+	
+	public GridReward() {
+
 	}
-	
-	
+
+	/* (non-Javadoc)
+	 * @see reward.Reward#Init(java.lang.String)
+	 */
+	@Override
+	public void Init(String game) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/* (non-Javadoc)
+	 * @see reward.Reward#getReward(util.ObservableEnvInfo, java.util.Vector, int)
+	 */
+	@Override
+	public double getReward(ObservableEnvInfo s, Vector<Object> actions,
+			int agent) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/* (non-Javadoc)
+	 * @see reward.Reward#getReward(java.util.Vector, int)
+	 */
+	@Override
+	public double getReward(Vector<Object> actions, int agent) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/* (non-Javadoc)
+	 * @see reward.Reward#getRewards(util.ObservableEnvInfo, java.util.Vector)
+	 */
+	@Override
+	public double[] getRewards(ObservableEnvInfo st, Vector<Action> actions) {
+		boolean collision= false;
+		Info_Grid s = (Info_Grid)st;
+		double sum[] = new double[s.currentJointAction().size()];
+		for (int i = 0; i < sum.length; i++) {
+			if (collision)
+				sum[i] = getpudRewards(s)[i] + getcoinRewards(s)[i] + collisionVal;
+			else
+				sum[i] = getpudRewards(s)[i] + getcoinRewards(s)[i];
+		}
+	return sum;
+	}
+
+	/* (non-Javadoc)
+	 * @see reward.Reward#getRewards(java.util.Vector)
+	 */
+	@Override
+	public double[] getRewards(Vector<Object> actions) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see reward.Reward#isSymmetric()
+	 */
+	@Override
+	public boolean isSymmetric() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see reward.Reward#swapPlayers(int, int)
+	 */
+	@Override
+	public Reward swapPlayers(int i, int j) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see reward.Reward#getNumActions()
+	 */
+	@Override
+	public int[] getNumActions() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void Init(ReadXml xml) {
+		String splitCoordinate[]  = new String[2];
+		
+		collisionVal = Integer.parseInt(xml.getTagAttribute("Type", "collisionVal"));
+		System.out.println("collision value:" + collisionVal);
+		
+		NodeList coinList = xml.getElementsByTagName("Coins");
+		
+		for (int i = 0; i < coinList.getLength(); i++) {
+			NodeList list = coinList.item(i).getChildNodes();
+			Element coord = (Element) list.item(1);
+			splitCoordinate = xml.getTextValue (coord, "Coordinate").split("\\,");
+			Vector<Integer>ccoordinate= new Vector<Integer>(2);
+			ccoordinate.add(Integer.parseInt(splitCoordinate[0]));
+			ccoordinate.add(Integer.parseInt(splitCoordinate[1]));
+			coins.put(ccoordinate, xml.getFloatValue (coord, "Value"));
+		}
+		
+	}
 	
 	/**
 	 * @param state is the next state of the game
 	 * @return coin reward of the agent for the state
 	 */
-	public int getcoinReward (State state){
-		int rwd;
-		rwd = coins.get(state);
-		
-		return rwd;
-		
+	private float[] getcoinRewards(Info_Grid s){
+		float[] r = new float[s.currentJointCoord().size()];
+		for (int i = 0; i <s.currentJointCoord().size(); i++) {
+			if(coins.containsKey(s.currentJointCoord().get(i)))
+				r[i] = coins.get(s.currentJointCoord().get(i));
+			else
+				r[i] =  0;
+		}
+		return r;	
 	}
+	
 	/**
 	 * @param state is the next state of the game
-	 * @return pod reward of the agent for the state
+	 * @return coin reward of the agent for the state
 	 */
-	public int getpudReward (State state){
-		int rwd;
-		rwd = puds.get(state);
-		
-		return rwd;
-	}
-	
-	// returns reward as a double
-	
-	public double getReward(State s, boolean collision){
-		double sum = 0;
-			if (collision)
-				sum = getpudReward(s) + getcoinReward(s) + collisionVal;
+	private float[] getpudRewards(Info_Grid s){
+		float[] r = new float[s.currentJointCoord().size()];
+		for (int i = 0; i <s.currentJointCoord().size(); i++) {
+			if(puds.containsKey(s.currentJointCoord().get(i)))
+				r[i] = puds.get(s.currentJointCoord().get(i));
 			else
-				sum = getpudReward(s) + getcoinReward(s);
-		return sum;
+				r[i] =  0;
+		}
+		return r;	
 	}
 
 }

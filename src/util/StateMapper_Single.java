@@ -17,46 +17,47 @@
  * Contributors:
  *     Enrique Munoz de Cote - initial API and implementation
  ******************************************************************************/
-/**
- * 
- */
 package util;
 
-import agent.Agent;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Vector;
 
 /**
  * @author Enrique Munoz de Cote
  *
  */
-public class NintegerAction extends Action {
-	//private NintegerActionDomain domain;
-	private int action;
-	private static int defAction = 0;
-	private int size;
+public class StateMapper_Single extends StateMapper<State_JointAction> {
+	private State_JointAction state; //dummy state
 	
-	
-	public NintegerAction(String stringName, int domainRange){
-		actionName = stringName;
-		domain = new NintegerActionDomain(domainRange);
-		size = domainRange;
+	public StateMapper_Single(){
 	}
-	public NintegerAction(int domainRange){
-		domain = new NintegerActionDomain(domainRange);
-		action = defAction;
-		state = defAction;
-		size = domainRange;
+	/**
+	 * Constructs state space and strategy
+	 * @param e
+	 */
+	public void init(ObservableEnvInfo info){
+		stateDomain = new StateDomain_Single();
+		state = stateDomain.getState(info);
 	}
 	
-	public NintegerAction(int domainRange, int id){
-		domain = new NintegerActionDomain(domainRange);
-		action = defAction;
-		state = defAction;
-		size = domainRange;
-		agentId = id;
+	public State_JointAction getState(Info_NFG info){
+		return state;
 	}
 	
+	@Override
+	public State_JointAction getState(ObservableEnvInfo info){
+		return state;
+	}
 	
-	public NintegerAction newInstance(){
-		return new NintegerAction(size, agentId);
+	@Override
+	public Vector<Action> getActions(ObservableEnvInfo info){
+		Info_NFG state = (Info_NFG) info;
+		return state.currentJointAction();
+	}
+	
+	@Override
+	public Vector<Object> getFeatures(ObservableEnvInfo info){
+		return getState(info).getFeatures();
 	}
 }

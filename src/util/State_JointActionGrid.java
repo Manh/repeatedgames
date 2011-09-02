@@ -19,11 +19,38 @@
  ******************************************************************************/
 package util;
 
-public class JointActionDomain extends ActionDomain {
+import java.util.Vector;
 
-	public JointActionDomain(){
-		
+/**
+ * @author Enrique Munoz de Cote
+ *
+ */
+public class State_JointActionGrid extends State {
+	// actionssSet is the list of actions of the agents in the game, 
+	private static Vector<Object> jointAction;
+	
+	public State_JointActionGrid(){
+		super();
 	}
 	
+	//Constructor
+	public State_JointActionGrid (Vector<Action> actions, Vector<Coordinate> coords){
+		jointAction = new Vector<Object>();
+		init(actions);
+	}
 	
+	public void init(Vector<Action> actions){
+		for (Action action : actions) {
+			jointAction.add(action.getCurrentState());
+		}
+		domain = new StateDomain_JointAction(actions);
+	}
+	
+	public Vector<Object> getJointAction(){
+		return jointAction;
+	}
+	
+	public String name (Action a){
+		return a.getName();
+	}
 }

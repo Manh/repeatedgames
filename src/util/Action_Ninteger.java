@@ -17,47 +17,41 @@
  * Contributors:
  *     Enrique Munoz de Cote - initial API and implementation
  ******************************************************************************/
+/**
+ * 
+ */
 package util;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Vector;
 
 /**
  * @author Enrique Munoz de Cote
  *
  */
-public class SingleStateMapper extends StateMapper<JointActionState> {
-	private JointActionState state; //dummy state
+public class Action_Ninteger extends Action {
+	private static int defAction = 0;
+	private int size;
 	
-	public SingleStateMapper(){
-	}
-	/**
-	 * Constructs state space and strategy
-	 * @param e
-	 */
-	public void init(ObservableEnvInfo info){
-		stateDomain = new SingleStateDomain();
-		state = stateDomain.getState(info);
-	}
 	
-	public JointActionState getState(NFGInfo info){
-		return state;
+	public Action_Ninteger(String stringName, int domainRange){
+		actionName = stringName;
+		domain = new ActionDomain_Ninteger(domainRange);
+		size = domainRange;
+	}
+	public Action_Ninteger(int domainRange){
+		domain = new ActionDomain_Ninteger(domainRange);
+		state = defAction;
+		size = domainRange;
 	}
 	
-	@Override
-	public JointActionState getState(ObservableEnvInfo info){
-		return state;
+	public Action_Ninteger(int domainRange, int id){
+		domain = new ActionDomain_Ninteger(domainRange);
+		state = defAction;
+		size = domainRange;
+		agentId = id;
 	}
 	
-	@Override
-	public Vector<Action> getActions(ObservableEnvInfo info){
-		NFGInfo state = (NFGInfo) info;
-		return state.currentJointAction();
-	}
 	
-	@Override
-	public Vector<Object> getFeatures(ObservableEnvInfo info){
-		return getState(info).getFeatures();
+	public Action_Ninteger newInstance(){
+		return new Action_Ninteger(size, agentId);
 	}
 }
